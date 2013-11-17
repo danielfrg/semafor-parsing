@@ -34,3 +34,8 @@ nosetests.xml
 .mr.developer.cfg
 .project
 .pydevproject
+.idea
+.vagrant
+
+# Security... :P
+local_settings.py

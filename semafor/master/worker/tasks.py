@@ -155,7 +155,7 @@ def semafor_parse(urls, n_instances=1):
                                  settings.AWS_ACCESS_ID,
                                  settings.AWS_SECRET_KEY,
                                  settings.S3_PATH,
-                                 settings.SALT_MASTER_PUBLIC_ADDRESS)
+                                 settings.LUIGI_CENTRAL_SCHEDULER)
         tasks.append(task)
         start = ends
 

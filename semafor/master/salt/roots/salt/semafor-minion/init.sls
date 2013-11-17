@@ -27,6 +27,11 @@ https://github.com/danielfrg/semafor-parsing:
     - system_site_packages: false
     - pip: True
 
+celery:
+  pip.installed:
+    - user: {{ pillar['user'] }}
+    - bin_env: /home/{{ pillar['user'] }}/venv
+
 luigi:
   pip.installed:
     - user: {{ pillar['user'] }}

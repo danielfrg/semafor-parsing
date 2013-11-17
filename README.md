@@ -43,11 +43,15 @@ AWS_ACCESS_ID = 'AWS ACCOUNT KEY'
 AWS_SECRET_KEY = 'AAWS ACCOUNT SECRET'
 READABILITY_TOKEN = 'READABILITY API TOKEN'
 SALT_MASTER_PUBLIC_ADDRESS = 'THE IP OF THE MASTER'
+LUIGI_CENTRAL_SCHEDULER = 'THE IP OF THE LUIGI SCHEDULER, CAN BE THE SAME SALT MASTER'
 ```
 
-Start the celery worker, a helper script is provided on: `semafor/master/start_worker.sh`
+Start the celery worker, a helper script is provided on: `semafor/master/start_worker.sh`. Note that you need to run this
+script with superuser priviliges because is going to call some salt functions.
 
 Call the the celery task, a helper script is provided on: `semafor/master/test.py`
 
 Optional: Start the luigi daemon to see the UI:
 `/home/ubunut/venv/luigid`. Add `&` or `--background` to run in the background.
+
+The luigi UI can be found in LUIGI_CENTRAL_SCHEDULER:8082

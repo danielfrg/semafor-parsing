@@ -36,5 +36,18 @@ project master using: `salt-call 'MINION_IP' state.sls semafor-master`
 
 Find the IP of the master you created and ssh to it (if using option 1 you can do `vagrant ssh`)
 
-Set the ip on the master settings: `cd semafor/master/` edit `settings.py or `local_settings.py`
-SALT_MASTER_PUBLIC_ADDRESS = ''
+Set the settings: `cd semafor/master/` edit `settings.py or `local_settings.py`, you need:
+```
+S3_PATH = 'WHERE THE SEMAFOR FILES WILL BE UPLOADED'
+AWS_ACCESS_ID = 'AWS ACCOUNT KEY'
+AWS_SECRET_KEY = 'AAWS ACCOUNT SECRET'
+READABILITY_TOKEN = 'READABILITY API TOKEN'
+SALT_MASTER_PUBLIC_ADDRESS = 'THE IP OF THE MASTER'
+```
+
+Start the celery worker, a helper script is provided on: `semafor/master/start_worker.sh`
+
+Call the the celery task, a helper script is provided on: `semafor/master/test.py`
+
+Optional: Start the luigi daemon to see the UI:
+`/home/ubunut/venv/luigid`. Add `&` or `--background` to run in the background.

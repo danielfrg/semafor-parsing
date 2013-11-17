@@ -49,6 +49,20 @@ boto:
     - user: {{ pillar['user'] }}
     - bin_env: /home/{{ pillar['user'] }}/venv
 
+luigi:
+  pip.installed:
+    - user: {{ pillar['user'] }}
+    - bin_env: /home/{{ pillar['user'] }}/venv
+
+tornado:
+  pip.installed:
+    - user: {{ pillar['user'] }}
+    - bin_env: /home/{{ pillar['user'] }}/venv
+
+daemon:
+  pip.installed:
+    - user: {{ pillar['user'] }}
+    - bin_env: /home/{{ pillar['user'] }}/venv
 
 
 

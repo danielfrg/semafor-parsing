@@ -18,7 +18,6 @@ https://github.com/danielfrg/semafor-parsing:
     - user: {{ pillar['user'] }}
     - target: /home/{{ pillar['user'] }}/semafor/app
 
-
 # --------------------------------------------------------------------
 #                              Python
 
@@ -28,17 +27,27 @@ https://github.com/danielfrg/semafor-parsing:
     - system_site_packages: false
     - pip: True
 
-requests:
-  pip.installed:
-    - user: {{ pillar['user'] }}
-    - bin_env: /home/{{ pillar['user'] }}/venv
-
 luigi:
   pip.installed:
     - user: {{ pillar['user'] }}
     - bin_env: /home/{{ pillar['user'] }}/venv
 
+requests:
+  pip.installed:
+    - user: {{ pillar['user'] }}
+    - bin_env: /home/{{ pillar['user'] }}/venv
+
 nltk:
+  pip.installed:
+    - user: {{ pillar['user'] }}
+    - bin_env: /home/{{ pillar['user'] }}/venv
+
+beautifulsoup4:
+  pip.installed:
+    - user: {{ pillar['user'] }}
+    - bin_env: /home/{{ pillar['user'] }}/venv
+
+boto:
   pip.installed:
     - user: {{ pillar['user'] }}
     - bin_env: /home/{{ pillar['user'] }}/venv

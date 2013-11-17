@@ -4,4 +4,4 @@ from celery import Celery
 
 app = Celery()
 
-app.config_from_object('minion.worker.celeryconfig')
+app.config_from_object('semafor.minion.worker.celeryconfig')

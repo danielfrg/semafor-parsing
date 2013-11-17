@@ -42,7 +42,7 @@ def create_instances(n=1, sleep=10, provision_timeout=900):
     logger.info('1/4: Initializing EC2 instances')
     user_data = salt_bootstrap.format(settings.SALT_MASTER_PUBLIC_ADDRESS)
     conn = boto.connect_ec2(settings.AWS_ACCESS_ID, settings.AWS_SECRET_KEY)
-    reservation = conn.run_instances(min_count=n, max_count=n, instance_type='m2.xlarge',
+    reservation = conn.run_instances(min_count=n, max_count=n, instance_type='t1.micro',#instance_type='m2.xlarge',
                                      image_id='ami-a73264ce', key_name='my_aws',
                                      placement='us-east-1a', user_data=user_data)
     instances = reservation.instances
@@ -124,20 +124,40 @@ def semafor_parse(urls, n_instances=1):
         a list of urls
     '''
     import salt.client
+    from semafor.minion.worker.tasks import run_semafor
 
     # 1. Create instances
     minion_ips = create_instances(n=n_instances)
 
-    # 2. Start celery worker
+    # 1.2 Ping minions
     client = salt.client.LocalClient()
-    ret = client.cmd(minion_ips, 'cmd.run', ['whoami'], expr_form='list')
-    for i, minion_ip in enumerate(ret):
-        logger.info('!!!! Ping minion %i[%s]: %s' % (i, minion_ip, ret[minion_ip]))
     ret = client.cmd(minion_ips, 'test.ping', ['whoami'], expr_form='list')
     for i, minion_ip in enumerate(ret):
-        logger.info('!!!! Ping minion %i[%s]: %s' % (i, minion_ip, ret[minion_ip]))
+        logger.info('Ping minion %i[%s]: %s' % (i, minion_ip, ret[minion_ip]))
 
+    # 2. Start celery workers
+    client = salt.client.LocalClient()
+    cmd = 'bash /home/ubuntu/semafor/app/semafor/minion/start_worker.sh'
+    broker = settings.SALT_MASTER_PUBLIC_ADDRESS
+    ret = client.cmd(minion_ips, 'cmd.run', [cmd, broker], expr_form='list')
+    for i, minion_ip in enumerate(ret):
+        logger.info('Celery worker minion %i[%s]: %s' % (i, minion_ip, ret[minion_ip]))
 
+    # 3. Call celery workers
+    start = 0
+    tasks = []
+    docs_per_chunk = len(urls) // n_instances
+    for i in range(n_instances):
+        ends = start + docs_per_chunk if i < n_instances - 1 else len(urls)
 
+        task = run_semafor.delay(urls[start:ends],
+                                 settings.READABILITY_TOKEN,
+                                 settings.AWS_ACCESS_ID,
+                                 settings.AWS_SECRET_KEY,
+                                 settings.S3_PATH,
+                                 settings.SALT_MASTER_PUBLIC_ADDRESS)
+        tasks.append(task)
+        start = ends
 
+    return [task.get() for task in tasks]
 

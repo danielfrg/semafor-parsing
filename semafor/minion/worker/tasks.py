@@ -1,7 +1,6 @@
 from __future__ import absolute_import
 
 import os
-import luigi
 from semafor.minion import settings
 from semafor.minion import pipeline
 from minion.worker.celery import app
@@ -13,8 +12,8 @@ logger = get_task_logger(__name__)
 @app.task
 def run_semafor(urls, readability_token, aws_key, aws_secret, s3_path,
                 luigi_scheduler_host=''):
-    '''
-    '''
+    import luigi
+    
     # 0. Set settings
     settings.S3_PATH = s3_path
     settings.AWS_KEY = aws_key

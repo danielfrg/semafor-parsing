@@ -42,7 +42,7 @@ def create_instances(n=1, sleep=10, provision_timeout=900):
     logger.info('1/4: Initializing EC2 instances')
     user_data = salt_bootstrap.format(settings.SALT_MASTER_PUBLIC_ADDRESS)
     conn = boto.connect_ec2(settings.AWS_ACCESS_ID, settings.AWS_SECRET_KEY)
-    reservation = conn.run_instances(min_count=n, max_count=n, instance_type='t1.micro',
+    reservation = conn.run_instances(min_count=n, max_count=n, instance_type='m2.xlarge',
                                      image_id='ami-a73264ce', key_name='my_aws',
                                      placement='us-east-1a', user_data=user_data)
     instances = reservation.instances

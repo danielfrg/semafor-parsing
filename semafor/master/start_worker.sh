@@ -11,4 +11,4 @@ fi
 
 export PYTHONPATH=/home/$(echo $USER)/semafor/app:$PYTHONPATH
 
-/home/$(echo $USER)/venv/bin/celery worker --app=semafor.master.worker.celery -l info
+/home/$(echo $USER)/venv/bin/celery worker --app=semafor.master.worker.celery -l info -Q semafor.master

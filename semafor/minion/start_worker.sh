@@ -9,6 +9,10 @@ else
   exit 1
 fi
 
+if [ -e /home/$(echo $USER)/celery.pid ]
+then
+    kill -9 $(cat /home/$(echo $USER)/celery.pid)
+fi
 export PYTHONPATH=/home/$(echo $USER)/semafor/app:$PYTHONPATH
 
-/home/$(echo $USER)/venv/bin/celery worker --app=semafor.minion.worker.celery -l info -D -Q semafor.minion -c 1 --logfile=/home/$(echo $USER)/celery.log --broker=$1
+/home/$(echo $USER)/venv/bin/celery worker --app=semafor.minion.worker.celery -l info -D -Q semafor.minion -c 1 --logfile=/home/$(echo $USER)/celery.log --pidfile=/home/$(echo $USER)/celery.pid --broker=$1

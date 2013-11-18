@@ -128,10 +128,10 @@ def semafor_parse(urls, n_instances=None):
     import salt.client
     from semafor.minion.worker.tasks import run_semafor
 
-    if not n_instances:
+    if n_instances:
         # 1. Create instances
-        #minion_ips = create_instances(n=n_instances)
-        minion_ips = ['ip-10-143-135-249.ec2.internal', 'ip-10-136-6-234.ec2.internal', 'ip-10-140-67-148.ec2.internal']
+        minion_ips = create_instances(n=n_instances)
+        #minion_ips = ['ip-10-143-135-249.ec2.internal', 'ip-10-136-6-234.ec2.internal', 'ip-10-140-67-148.ec2.internal']
 
         # 2 Ping minions
         client = salt.client.LocalClient()
@@ -141,9 +141,8 @@ def semafor_parse(urls, n_instances=None):
 
         # 3 Start celery workers
         client = salt.client.LocalClient()
-        cmd = 'sh /home/ubuntu/semafor/app/semafor/minion/start_worker.sh'
-        broker = 'amqp://guest@%s//' % settings.SALT_MASTER_PUBLIC_ADDRESS
-        ret = client.cmd(minion_ips, 'cmd.run', [cmd], [[broker]], expr_form='list')
+        cmd = 'sh /home/ubuntu/semafor/app/semafor/minion/start_worker.sh %s' % settings.SALT_MASTER_PUBLIC_ADDRESS
+        ret = client.cmd(minion_ips, 'cmd.run', [cmd], expr_form='list')
         for i, minion_ip in enumerate(ret):
             logger.info('Celery worker minion %i[%s]: %s' % (i+1, minion_ip, ret[minion_ip]))
 

@@ -94,10 +94,8 @@ def create_instances(n=1, sleep=10, provision_timeout=900):
     logger.info('3/4: Ping minions before provisioning')
     logger.info('3/4: Minion ips are:')
     logger.info(minion_ips)
-    ret = client.cmd(minion_ips, 'cmd.run', ['whoami'], expr_form='list')
-    for minion_ip in enumerate(ret):
-        logger.info('3/4: Ping minion %i[%s]: %s' % (i, minion_ip, ret[minion_ip]))
     logger.info('3/4: Provisioning EC2 instances using salt.sls semafor-minion')
+    time.sleep(20)
     ret = client.cmd(minion_ips, 'state.sls', ['semafor-minion'], timeout=provision_timeout, expr_form='list')
     if not ret:
         logger.info('3/4: Salt provisioning timed out, maybe is still running...')
@@ -130,10 +128,10 @@ def semafor_parse(urls, n_instances=None):
     import salt.client
     from semafor.minion.worker.tasks import run_semafor
 
-    if n_instances:
+    if not n_instances:
         # 1. Create instances
-        minion_ips = create_instances(n=n_instances)
-        #minion_ips = ['ip-10-136-6-237.ec2.internal', 'ip-10-143-128-6.ec2.internal', 'ip-10-143-136-81.ec2.internal']
+        #minion_ips = create_instances(n=n_instances)
+        minion_ips = ['ip-10-143-135-249.ec2.internal', 'ip-10-136-6-234.ec2.internal', 'ip-10-140-67-148.ec2.internal']
 
         # 2 Ping minions
         client = salt.client.LocalClient()
@@ -143,11 +141,11 @@ def semafor_parse(urls, n_instances=None):
 
         # 3 Start celery workers
         client = salt.client.LocalClient()
-        cmd = '/home/ubuntu/semafor/app/semafor/minion/start_worker.sh'
+        cmd = 'sh /home/ubuntu/semafor/app/semafor/minion/start_worker.sh'
         broker = 'amqp://guest@%s//' % settings.SALT_MASTER_PUBLIC_ADDRESS
         ret = client.cmd(minion_ips, 'cmd.run', [cmd], [[broker]], expr_form='list')
         for i, minion_ip in enumerate(ret):
-            logger.info('Celery worker minion %i[%s]: %s' % (i, minion_ip, ret[minion_ip]))
+            logger.info('Celery worker minion %i[%s]: %s' % (i+1, minion_ip, ret[minion_ip]))
 
     # Call celery workers
     start = 0
@@ -165,5 +163,6 @@ def semafor_parse(urls, n_instances=None):
         tasks.append(task)
         start = ends
 
-    return [task.get() for task in tasks]
+    logger.info('Celery worker minion are working, waiting for them :)')
+    #return [task.get() for task in tasks]
 

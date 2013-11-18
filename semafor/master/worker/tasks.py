@@ -135,13 +135,13 @@ def semafor_parse(urls, n_instances=None):
         minion_ips = create_instances(n=n_instances)
         #minion_ips = ['ip-10-136-6-237.ec2.internal', 'ip-10-143-128-6.ec2.internal', 'ip-10-143-136-81.ec2.internal']
 
-        # 1.2 Ping minions
+        # 2 Ping minions
         client = salt.client.LocalClient()
         ret = client.cmd(minion_ips, 'test.ping', expr_form='list')
         for i, minion_ip in enumerate(ret):
             logger.info('Ping minion %i[%s]: %s' % (i, minion_ip, ret[minion_ip]))
 
-        # 2. Start celery workers
+        # 3 Start celery workers
         client = salt.client.LocalClient()
         cmd = '/home/ubuntu/semafor/app/semafor/minion/start_worker.sh'
         broker = 'amqp://guest@%s//' % settings.SALT_MASTER_PUBLIC_ADDRESS
@@ -149,21 +149,21 @@ def semafor_parse(urls, n_instances=None):
         for i, minion_ip in enumerate(ret):
             logger.info('Celery worker minion %i[%s]: %s' % (i, minion_ip, ret[minion_ip]))
 
-    # 3. Call celery workers
-    #start = 0
-    #tasks = []
-    #docs_per_chunk = len(urls) // n_instances
-    #for i in range(n_instances):
-    #    ends = start + docs_per_chunk if i < n_instances - 1 else len(urls)
-    #
-    #    task = run_semafor.delay(urls[start:ends],
-    #                             settings.READABILITY_TOKEN,
-    #                             settings.AWS_ACCESS_ID,
-    #                             settings.AWS_SECRET_KEY,
-    #                             settings.S3_PATH,
-    #                             settings.LUIGI_CENTRAL_SCHEDULER)
-    #    tasks.append(task)
-    #    start = ends
-    #
-    #return [task.get() for task in tasks]
+    # Call celery workers
+    start = 0
+    tasks = []
+    docs_per_chunk = len(urls) // n_instances
+    for i in range(n_instances):
+        ends = start + docs_per_chunk if i < n_instances - 1 else len(urls)
+
+        task = run_semafor.delay(urls[start:ends],
+                                 settings.READABILITY_TOKEN,
+                                 settings.AWS_ACCESS_ID,
+                                 settings.AWS_SECRET_KEY,
+                                 settings.S3_PATH,
+                                 settings.LUIGI_CENTRAL_SCHEDULER)
+        tasks.append(task)
+        start = ends
+
+    return [task.get() for task in tasks]
 

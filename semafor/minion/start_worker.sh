@@ -11,4 +11,4 @@ fi
 
 export PYTHONPATH=/home/$(echo $USER)/semafor/app:$PYTHONPATH
 
-/home/$(echo $USER)/venv/bin/celeryd worker --app=semafor.minion.worker.celery -l info --broker=$1 -Q semafor.minion
+/home/$(echo $USER)/venv/bin/celery worker --app=semafor.minion.worker.celery -l info -D -Q semafor.minion -c 1 --broker=$1

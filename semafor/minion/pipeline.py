@@ -37,11 +37,17 @@ class DownloadDocs(luigi.Task):
         for url, outfile in zip(urls, self.output()):
             payload = {'url': url, 'token': settings.READABILITY_TOKEN}
             r = requests.get(BASE_URL, params=payload)
-            html_content = r.json()['content']
-            soup = BeautifulSoup(html_content)
+            ans = r.json()
+            text = ''
+            if 'content' in ans:
+                html_content = r.json()['content']
+                soup = BeautifulSoup(html_content)
+                text = soup.get_text(' ')
+            else:
+                text = 'NO-HTML-CONTENT'
 
             f = outfile.open('w')
-            f.write(soup.get_text(' ').encode('utf-8'))
+            f.write(text.encode('utf-8'))
             f.close()
 
 

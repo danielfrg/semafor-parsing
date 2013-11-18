@@ -6,4 +6,4 @@ CELERY_RESULT_SERIALIZER = 'json'
 
 CELERY_IMPORTS = ('semafor.minion.worker.tasks', )
 
-CELERY_ROUTES = {'semafor.minion.worker.tasks.run_semafor': {'queue': 'semafor.worker'}}
+CELERY_ROUTES = {'semafor.minion.worker.tasks.run_semafor': {'queue': 'semafor.minion'}}

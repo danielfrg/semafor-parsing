@@ -131,7 +131,7 @@ def semafor_parse(urls, n_instances=None):
     if n_instances:
         # 1. Create instances
         minion_ips = create_instances(n=n_instances)
-        #minion_ips = ['ip-10-143-135-249.ec2.internal', 'ip-10-136-6-234.ec2.internal', 'ip-10-140-67-148.ec2.internal']
+        #minion_ips = ['ip-10-150-20-197.ec2.internal', 'ip-10-143-187-79.ec2.internal', 'ip-10-143-187-85.ec2.internal']
 
         # 2 Ping minions
         client = salt.client.LocalClient()
@@ -152,7 +152,7 @@ def semafor_parse(urls, n_instances=None):
     docs_per_chunk = len(urls) // n_instances
     for i in range(n_instances):
         ends = start + docs_per_chunk if i < n_instances - 1 else len(urls)
-
+        print i, start, ends
         task = run_semafor.delay(urls[start:ends],
                                  settings.READABILITY_TOKEN,
                                  settings.AWS_ACCESS_ID,
@@ -163,5 +163,6 @@ def semafor_parse(urls, n_instances=None):
         start = ends
 
     logger.info('Celery worker minion are working, waiting for them :)')
+    print tasks
     #return [task.get() for task in tasks]
 

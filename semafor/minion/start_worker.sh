@@ -15,4 +15,4 @@ then
 fi
 export PYTHONPATH=/home/$(echo $USER)/semafor/app:$PYTHONPATH
 
-/home/$(echo $USER)/venv/bin/celery worker --app=semafor.minion.worker.celery -l info -D -Q semafor.minion -c 1 --logfile=/home/$(echo $USER)/celery.log --pidfile=/home/$(echo $USER)/celery.pid --broker=$1
+/home/$(echo $USER)/venv/bin/celery worker --app=semafor.minion.worker.celery -D -l info --concurrency=1 --queues=semafor.minion --logfile=/home/$(echo $USER)/celery.log --pidfile=/home/$(echo $USER)/celery.pid --broker=$1

@@ -78,4 +78,4 @@ urls = ['http://brandednoise.com/2013/07/28/the-wabi-sabi-edge/',
 'http://dischordantforms.wordpress.com/2013/10/30/remembering-lou-reed-in-light-of-lulu/',
 'http://vincentmars.com/2013/10/30/you-dont-need-to-wear-a-costume-to-be-monstrous-this-halloween-you-are-monstrous-the-way-you-are/']
 
-print tasks.semafor_parse.delay(urls, n_instances=3)
+print tasks.semafor_parse.delay(urls, n_instances=1)

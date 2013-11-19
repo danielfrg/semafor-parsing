@@ -55,7 +55,7 @@ nltk_data_check:
 # Download nltk data (if doesn't exists)
 nltk_data:
   cmd.wait:
-    - name: "/home/{{ pillar['user'] }}/venv/bin/python -c \"import nltk; nltk.download('all')\""
+    - name: "/home/{{ pillar['user'] }}/venv/bin/python -c \"import nltk; nltk.download('all', download_dir='/usr/share/nltk_data')\""
     - user: {{ pillar['user'] }}
     - cwd: /home/{{ pillar['user'] }}
     - watch:

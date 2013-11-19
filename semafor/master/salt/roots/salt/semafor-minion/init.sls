@@ -46,6 +46,21 @@ nltk:
     - user: {{ pillar['user'] }}
     - bin_env: /home/{{ pillar['user'] }}/venv
 
+# Check if nltk_data exists
+nltk_data_check:
+  cmd.run:
+    - name: "[ -e /home/{{ pillar['user'] }}/nltk_data ] && echo 'changed=no' || echo 'changed=yes'"
+    - stateful: True
+
+# Download nltk data if not exists
+nltk_data:
+  cmd.wait:
+    - name: "/home/{{ pillar['user'] }}/venv/bin/python -c "import nltk; nltk.download('all')"
+    - user: {{ pillar['user'] }}
+    - cwd: /home/{{ pillar['user'] }}
+    - watch:
+        - cmd: nltk_data_check
+
 beautifulsoup4:
   pip.installed:
     - user: {{ pillar['user'] }}

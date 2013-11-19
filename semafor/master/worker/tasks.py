@@ -22,7 +22,7 @@ salt-minion -d
 
 
 @app.task
-def create_instances(n=1, sleep=10, provision_timeout=900):
+def create_instances(n=1, sleep=10):
     '''
     Creates and provisions the minions instances
     Returns
@@ -35,8 +35,6 @@ def create_instances(n=1, sleep=10, provision_timeout=900):
     import boto
     import time
     import subprocess
-    import salt.client
-    client = salt.client.LocalClient()
 
     # Create EC2 instances
     logger.info('1/4: Initializing EC2 instances')
@@ -90,8 +88,15 @@ def create_instances(n=1, sleep=10, provision_timeout=900):
         logger.info('2/4: Minion %i(%s) accepted: OUTPUT[%s] - ERRORS[%s]' % (i + 1, minion_ip, out, err))
     logger.info('2/4: Salt minions connected to master')
 
-    # PROVISION MINIONS
-    logger.info('3/4: Ping minions before provisioning')
+    return minion_ips
+
+
+@app.task
+def provision_minions(minion_ips, provision_timeout=900):
+    import time
+    import salt.client
+    client = salt.client.LocalClient()
+
     logger.info('3/4: Minion ips are:')
     logger.info(minion_ips)
     logger.info('3/4: Provisioning EC2 instances using salt.sls semafor-minion')
@@ -109,8 +114,6 @@ def create_instances(n=1, sleep=10, provision_timeout=900):
             worked = worked and _worked
         if worked:
             logger.info('3/4: Salt minion %i(%s) provisioning of EVERYTHING went OK' % (i + 1, minion_ip))
-
-    return minion_ips
 
 
 @app.task
@@ -131,20 +134,20 @@ def semafor_parse(urls, n_instances=None):
     if n_instances:
         # 1. Create instances
         minion_ips = create_instances(n=n_instances)
-        #minion_ips = ['ip-10-150-20-197.ec2.internal', 'ip-10-143-187-79.ec2.internal', 'ip-10-143-187-85.ec2.internal']
+        provision_minions(minion_ips)
 
         # 2 Ping minions
         client = salt.client.LocalClient()
         ret = client.cmd(minion_ips, 'test.ping', expr_form='list')
         for i, minion_ip in enumerate(ret):
-            logger.info('Ping minion %i[%s]: %s' % (i, minion_ip, ret[minion_ip]))
+            logger.info('Ping minion %i[%s]: %s' % (i + 1, minion_ip, ret[minion_ip]))
 
         # 3 Start celery workers
         client = salt.client.LocalClient()
         cmd = 'sh /home/ubuntu/semafor/app/semafor/minion/start_worker.sh %s' % settings.SALT_MASTER_PUBLIC_ADDRESS
-        ret = client.cmd(minion_ips, 'cmd.run', [cmd], expr_form='list')
+        ret = client.cmd(minion_ips, 'cmd.run', [cmd], expr_form='list', username='ubuntu')
         for i, minion_ip in enumerate(ret):
-            logger.info('Celery worker minion %i[%s]: %s' % (i+1, minion_ip, ret[minion_ip]))
+            logger.info('Celery worker minion %i[%s]: %s' % (i + 1, minion_ip, ret[minion_ip]))
 
     # Call celery workers
     start = 0

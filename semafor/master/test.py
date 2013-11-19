@@ -9,4 +9,4 @@ urls = ['http://brandednoise.com/2013/07/28/the-wabi-sabi-edge/',
 
 from semafor.master.test_long import urls as urls_long
 
-print tasks.semafor_parse.delay(urls, n_instances=1)
+print tasks.semafor_parse.delay(urls_long, n_instances=1)

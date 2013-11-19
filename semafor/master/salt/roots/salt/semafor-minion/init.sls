@@ -52,10 +52,10 @@ nltk_data_check:
     - name: "[ -e /home/{{ pillar['user'] }}/nltk_data ] && echo 'changed=no' || echo 'changed=yes'"
     - stateful: True
 
-# Download nltk data if not exists
+# Download nltk data (if doesn't exists)
 nltk_data:
   cmd.wait:
-    - name: "/home/{{ pillar['user'] }}/venv/bin/python -c "import nltk; nltk.download('all')"
+    - name: "/home/{{ pillar['user'] }}/venv/bin/python -c \"import nltk; nltk.download('all')\""
     - user: {{ pillar['user'] }}
     - cwd: /home/{{ pillar['user'] }}
     - watch:

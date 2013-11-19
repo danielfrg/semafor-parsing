@@ -52,6 +52,7 @@ script with superuser priviliges because is going to call some salt functions.
 Call the the celery task, a helper script is provided on: `semafor/master/test.py`
 
 Optional: Start the luigi daemon to see the UI:
-`/home/ubunut/venv/luigid`. Add `&` or `--background` to run in the background.
+`/home/ubunut/venv/bin/luigid`. Add `&` or `--background` to run in the background. The luigi UI can be found in LUIGI_CENTRAL_SCHEDULER:8082
 
-The luigi UI can be found in LUIGI_CENTRAL_SCHEDULER:8082
+
+

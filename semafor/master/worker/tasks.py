@@ -31,12 +31,12 @@ def create_instances(n=1, sleep=10):
         each value is the private_dns_name of the instance
         with this values is possible to call methods using salt
     '''
-    logger.info('Creating EC2 instances')
     import boto
     import time
     import subprocess
 
     # Create EC2 instances
+    logger.info('Creating EC2 instances')
     logger.info('1/4: Initializing EC2 instances')
     user_data = salt_bootstrap.format(settings.SALT_MASTER_PUBLIC_ADDRESS)
     conn = boto.connect_ec2(settings.AWS_ACCESS_ID, settings.AWS_SECRET_KEY)
@@ -99,8 +99,10 @@ def provision_minions(minion_ips, provision_timeout=900):
 
     logger.info('3/4: Minion ips are:')
     logger.info(minion_ips)
+
     logger.info('3/4: Provisioning EC2 instances using salt.sls semafor-minion')
     time.sleep(20)
+    ret = client.cmd(minion_ips, 'state.sls', ['semafor-minion'], timeout=provision_timeout, expr_form='list')
     ret = client.cmd(minion_ips, 'state.sls', ['semafor-minion'], timeout=provision_timeout, expr_form='list')
     if not ret:
         logger.info('3/4: Salt provisioning timed out, maybe is still running...')
@@ -128,10 +130,10 @@ def semafor_parse(urls, n_instances=None):
         just calls the celery workers and is going to use any
         existent workers
     '''
-    import salt.client
+    # import salt.client
     from semafor.minion.worker.tasks import run_semafor
 
-    if n_instances:
+    if not n_instances:
         # 1. Create instances
         minion_ips = create_instances(n=n_instances)
         provision_minions(minion_ips)
@@ -143,7 +145,6 @@ def semafor_parse(urls, n_instances=None):
             logger.info('Ping minion %i[%s]: %s' % (i + 1, minion_ip, ret[minion_ip]))
 
         # 3 Start celery workers
-        client = salt.client.LocalClient()
         cmd = 'sh /home/ubuntu/semafor/app/semafor/minion/start_worker.sh %s' % settings.SALT_MASTER_PUBLIC_ADDRESS
         ret = client.cmd(minion_ips, 'cmd.run', [cmd], expr_form='list', username='ubuntu')
         for i, minion_ip in enumerate(ret):
@@ -155,7 +156,7 @@ def semafor_parse(urls, n_instances=None):
     docs_per_chunk = len(urls) // n_instances
     for i in range(n_instances):
         ends = start + docs_per_chunk if i < n_instances - 1 else len(urls)
-        print i, start, ends
+
         task = run_semafor.delay(urls[start:ends],
                                  settings.READABILITY_TOKEN,
                                  settings.AWS_ACCESS_ID,

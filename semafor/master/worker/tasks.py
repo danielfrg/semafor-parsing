@@ -101,7 +101,6 @@ def provision_minions(minion_ips, provision_timeout=900):
     logger.info(minion_ips)
 
     logger.info('3/4: Provisioning EC2 instances using salt.sls semafor-minion')
-    time.sleep(20)
     ret = client.cmd(minion_ips, 'state.sls', ['semafor-minion'], timeout=provision_timeout, expr_form='list')
     ret = client.cmd(minion_ips, 'state.sls', ['semafor-minion'], timeout=provision_timeout, expr_form='list')
     if not ret:

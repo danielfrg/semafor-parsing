@@ -29,6 +29,7 @@ https://github.com/danielfrg/semafor-parsing:
 
 celery:
   pip.installed:
+    - user: {{ pillar['user'] }}
     - bin_env: /home/{{ pillar['user'] }}/venv
 
 luigi:

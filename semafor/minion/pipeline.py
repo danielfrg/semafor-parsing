@@ -27,7 +27,7 @@ class DownloadDocs(luigi.Task):
         urls = self.input().open('r').read().split('\n')
         urls = [url[7:] if url.startswith('http://') else url for url in urls]
         urls = [url.replace('/', '|') for url in urls]
-        urls = [url + '.txt' for url in urls]
+        urls = [url[:-50] + '.txt' for url in urls]
         return [luigi.LocalTarget(os.path.join(settings.DATA_DIR, fname)) for fname in urls]
 
     def run(self):

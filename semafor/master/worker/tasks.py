@@ -133,7 +133,7 @@ def semafor_parse(urls, n_instances=None):
     # import salt.client
     from semafor.minion.worker.tasks import run_semafor
 
-    if not n_instances:
+    if n_instances:
         # 1. Create instances
         minion_ips = create_instances(n=n_instances)
         provision_minions(minion_ips)

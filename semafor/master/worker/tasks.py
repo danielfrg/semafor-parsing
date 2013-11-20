@@ -129,7 +129,7 @@ def semafor_parse(urls, n_instances=None):
         just calls the celery workers and is going to use any
         existent workers
     '''
-    # import salt.client
+    import salt.client
     from semafor.minion.worker.tasks import run_semafor
 
     if n_instances:
@@ -139,11 +139,13 @@ def semafor_parse(urls, n_instances=None):
 
         # 2 Ping minions
         client = salt.client.LocalClient()
+        logger.info('Pinging minions')
         ret = client.cmd(minion_ips, 'test.ping', expr_form='list')
         for i, minion_ip in enumerate(ret):
             logger.info('Ping minion %i[%s]: %s' % (i + 1, minion_ip, ret[minion_ip]))
 
         # 3 Start celery workers
+        logger.info('Starting celery workers on minions')
         cmd = 'sh /home/ubuntu/semafor/app/semafor/minion/start_worker.sh %s' % settings.SALT_MASTER_PUBLIC_ADDRESS
         ret = client.cmd(minion_ips, 'cmd.run', [cmd], expr_form='list', username='ubuntu')
         for i, minion_ip in enumerate(ret):
